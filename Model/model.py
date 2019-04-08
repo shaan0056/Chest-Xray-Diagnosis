@@ -19,16 +19,16 @@ if torch.cuda.is_available():
         torch.cuda.manual_seed(42)
 
 
-FILE_PATH = "..\Data\CheXpert-v1.0-small\\"
+FILE_PATH = "../Data/CheXpert-v1.0-small/"
 TRAIN_FILE = "train.csv"
 VALID_FILE = "valid.csv"
 NUM_CLASSES = 14
 CLASS_NAMES = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity',
                'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax',
                'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
-BATCH_SIZE = 16
-NUM_WORKERS = 0
-NUM_EPOCHS = 20
+BATCH_SIZE = 128
+NUM_WORKERS = 4
+NUM_EPOCHS = 2000
 SAVE_FILE = "myCNN.pth"
 
 # Path for saving model
@@ -43,7 +43,7 @@ transform = transforms.Compose([transforms.RandomResizedCrop(224),
 dataset = ChexPertDataset(TRAIN_FILE,FILE_PATH,transform=transform)
 valid_dataset = ChexPertDataset(VALID_FILE,FILE_PATH,transform=transform)
 
-test_dataset,train_dataset = random_split(dataset,[5,len(dataset) - 5])
+test_dataset,train_dataset = random_split(dataset,[2000,len(dataset) - 2000])
 
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)

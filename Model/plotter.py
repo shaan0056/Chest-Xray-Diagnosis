@@ -100,11 +100,13 @@ def plot_auc(ground_truth,prediction,num_classes,class_names):
         plt.ylim([0, 1])
         plt.ylabel('True Positive Rate')
         plt.xlabel('False Positive Rate')
+        plt.savefig("ROC_{}.png".format(class_names[i]), dpi=1000)
+        plt.clf()
 
-    fig_size = plt.rcParams["figure.figsize"]
-    fig_size[0] = 30
-    fig_size[1] = 10
-    plt.rcParams["figure.figsize"] = fig_size
-
-    plt.savefig("ROC1345.png", dpi=1000)
-    plt.show()
+    # fig_size = plt.rcParams["figure.figsize"]
+    # fig_size[0] = 30
+    # fig_size[1] = 10
+    # plt.rcParams["figure.figsize"] = fig_size
+    #
+    # plt.savefig("ROC1345.png", dpi=1000)
+    # plt.show()
