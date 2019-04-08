@@ -73,7 +73,7 @@ for epoch in range(NUM_EPOCHS):
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
 
-        if epoch == 1:
+        if epoch == 0:
             best_val_loss = valid_loss
 
         is_best = valid_loss < best_val_loss
