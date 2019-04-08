@@ -20,13 +20,13 @@ if torch.cuda.is_available():
 
 
 FILE_PATH = "..\Data\CheXpert-v1.0-small\\"
-TRAIN_FILE = "train_sample.csv"
-VALID_FILE = "valid_sample.csv"
+TRAIN_FILE = "train.csv"
+VALID_FILE = "valid.csv"
 NUM_CLASSES = 14
 CLASS_NAMES = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity',
                'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax',
                'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
-BATCH_SIZE = 1
+BATCH_SIZE = 16
 NUM_WORKERS = 0
 NUM_EPOCHS = 20
 SAVE_FILE = "myCNN.pth"
