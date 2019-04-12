@@ -2,12 +2,11 @@
 import torch
 import pandas as pd
 from torch.utils.data import Dataset
-import cv2
 from PIL import Image
 
 class ChexPertDataset(Dataset):
 
-    def __init__(self,image_csv,file_path,transform=None):
+    def __init__(self,image_csv,file_path,transform=None,uncertainity=None):
 
         """
         Args:
@@ -22,7 +21,10 @@ class ChexPertDataset(Dataset):
         image_labels = image_csv_df.ix[:,5:].fillna(0)
 
         for col in image_labels:
-            image_labels[col].replace([-1],0,inplace=True)
+            if uncertainity is None:
+                image_labels[col].replace([-1],0,inplace=True)
+            if uncertainity == "ones":
+                image_labels[col].replace([-1], 1, inplace=True)
 
         self.labels = image_labels.values
         self.transform = transform
@@ -31,7 +33,6 @@ class ChexPertDataset(Dataset):
     def __getitem__(self, item):
 
         image = self.image[item]
-        #grayscale_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         image = Image.open(image).convert('RGB')
         if self.transform is not None:
             image = self.transform(image)
