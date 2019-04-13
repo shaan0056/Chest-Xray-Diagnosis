@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from sklearn.metrics.ranking import roc_auc_score
 
-class AverageMeter(object):
+class AverageMeter():
     """Computes and stores the average and current value"""
 
     def __init__(self):
@@ -23,22 +23,12 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
-def compute_batch_accuracy(output, target):
-    """Computes the accuracy for a batch"""
-    with torch.no_grad():
 
-        batch_size = target.size(0)
-        _, pred = output.max(1)
-        correct = pred.eq(target).sum()
-
-        return correct * 100.0 / batch_size
-
-
-def train(model, device, data_loader, criterion, optimizer, epoch, print_freq=10):
+def train(model, device, data_loader, criterion, optimizer, epoch,num_classes,competition, path,print_freq=10):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
-    accuracy = AverageMeter()
+    results = []
 
     model.train()
 
@@ -66,27 +56,38 @@ def train(model, device, data_loader, criterion, optimizer, epoch, print_freq=10
         end = time.time()
 
         losses.update(loss.item(), target.size(0))
-        #accuracy.update(compute_batch_accuracy(output, target).item(), target.size(0))
+
+        y_true = target.detach().to('cpu').numpy().tolist()
+        y_pred = output.detach().to('cpu').numpy().tolist()
+        results.extend(list(zip(y_true, y_pred)))
+        result = np.array(results)
+        average_auc = calculate_auc(result[:, 0, :], result[:, 1, :], num_classes, competition)
 
         if i % print_freq == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Accuracy {acc.val:.3f} ({acc.avg:.3f})'.format(
+                  'Average AUC {acc:.3f}'.format(
                 epoch, i, len(data_loader), batch_time=batch_time,
-                data_time=data_time, loss=losses, acc=accuracy))
+                data_time=data_time, loss=losses, acc=average_auc))
 
-    return losses.avg, accuracy.avg
+        if i % (4800 - 1) == 0: # Checkpoint the model every 4800 iterations
+
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'loss': loss
+            }, os.path.join(path, "chkpt-{}.pth ".format(i)))
+
+    return losses.avg, average_auc
 
 
-def evaluate(model, device, data_loader, criterion, print_freq=10):
+def evaluate(model, device, data_loader, criterion, num_classes,competition, print_freq=10):
     batch_time = AverageMeter()
     losses = AverageMeter()
-    accuracy = AverageMeter()
-
     results = []
-
     model.eval()
 
     with torch.no_grad():
@@ -105,38 +106,40 @@ def evaluate(model, device, data_loader, criterion, print_freq=10):
             # measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
-
             losses.update(loss.item(), target.size(0))
-            #accuracy.update(compute_batch_accuracy(output, target).item(), target.size(0))
 
             y_true = target.detach().to('cpu').numpy().tolist()
             y_pred = output.detach().to('cpu').numpy().tolist()
             results.extend(list(zip(y_true, y_pred)))
-
+            result = np.array(results)
+            average_auc = calculate_auc(result[:, 0, :], result[:, 1, :], num_classes, competition)
             if i % print_freq == 0:
                 print('Test: [{0}/{1}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                      'Accuracy {acc.val:.3f} ({acc.avg:.3f})'.format(
-                    i, len(data_loader), batch_time=batch_time, loss=losses, acc=accuracy))
-
-    return losses.avg, accuracy.avg, np.array(results)
+                      'Average AUC {acc:.3f}'.format(
+                    i, len(data_loader), batch_time=batch_time, loss=losses, acc=average_auc))
 
 
-def calculate_AUROC(ground_truth,prediction,num_classes):
+    return losses.avg, average_auc, result
+
+
+def calculate_auc(ground_truth, prediction, num_classes, competition=False):
 
     """Compute Area Under the Receiver Operating Characteristic Curve (ROC AUC)
-    from prediction scores."""
+    from prediction scores.
+    Index [2,5,6,8,10] correspond to the ChexPert competition labels : (a) Atelectasis,
+    (b) Cardiomegaly, (c) Consolidation, (d) Edema, and (e) Pleural Effusion"""
 
-    # return [roc_auc_score(ground_truth[:,i],prediction[:,i])
-    #         for i in range(num_classes)]
+    out_auroc = []
 
-    outAUROC = []
+    index = [2,5,6,8,10] if competition else range(num_classes)
 
-    for i in range(num_classes):
+    for i in index:
         try:
-            outAUROC.append(roc_auc_score(ground_truth[:, i], prediction[:, i]))
+            out_auroc.append(roc_auc_score(ground_truth[:, i], prediction[:, i]))
         except ValueError:
             pass
-    return np.array(outAUROC,dtype=np.float32)
+
+    return np.array(out_auroc,dtype=np.float32).mean()
 

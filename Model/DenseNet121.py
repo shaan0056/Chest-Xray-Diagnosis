@@ -7,6 +7,8 @@ class DenseNet121(nn.Module):
 
         super(DenseNet121,self).__init__()
         self.denseNet121 = torchvision.models.densenet121(pretrained=True)
+        for params in self.denseNet121.parameters():
+            params.requires_grad = False
         features = self.denseNet121.classifier.in_features
 
         self.denseNet121.classifier = nn.Sequential(

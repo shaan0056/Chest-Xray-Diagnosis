@@ -5,7 +5,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
 
 
-def plot_learning_curves(train_losses, valid_losses):
+def plot_learning_curves(train_losses, valid_losses,train_auc,valid_auc):
 
 
 
@@ -17,6 +17,16 @@ def plot_learning_curves(train_losses, valid_losses):
       plt.tight_layout()
       plt.legend(["Training Loss","Validation Loss"],loc='upper right')
       plt.savefig("Loss-Curve.jpg")
+      plt.clf()
+
+      plt.plot(np.arange(len(train_auc)), train_auc)
+      plt.plot(np.arange(len(valid_auc)), valid_auc)
+      plt.title("AUC Curve")
+      plt.xlabel("epoch")
+      plt.ylabel("AUC")
+      plt.legend(["Training AUC", "Validation AUC"], loc='upper right')
+      plt.tight_layout()
+      plt.savefig("AUC-Curve.jpg")
       plt.clf()
 
       pass
