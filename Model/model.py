@@ -30,8 +30,8 @@ if torch.cuda.is_available():
 
 
 FILE_PATH = "../Data/CheXpert-v1.0-small/"
-TRAIN_FILE = "train_sample.csv"
-VALID_FILE = "valid_sample.csv"
+TRAIN_FILE = "train.csv"
+VALID_FILE = "valid.csv"
 NUM_CLASSES = 14
 CLASS_NAMES = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung Opacity',
                'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax',
