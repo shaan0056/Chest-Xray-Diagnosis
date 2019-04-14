@@ -37,7 +37,7 @@ CLASS_NAMES = ['No Finding', 'Enlarged Cardiomediastinum', 'Cardiomegaly', 'Lung
                'Lung Lesion', 'Edema', 'Consolidation', 'Pneumonia', 'Atelectasis', 'Pneumothorax',
                'Pleural Effusion', 'Pleural Other', 'Fracture', 'Support Devices']
 BATCH_SIZE = 16
-NUM_WORKERS = 0
+NUM_WORKERS = 16
 NUM_EPOCHS = 3
 SAVE_FILE = "myCNN.pth"
 
@@ -79,7 +79,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 criterion.to(device)
 
-best_val_auc = 0.8
+best_val_auc = 0.7
 train_losses, train_accuracies = [], []
 valid_losses, valid_accuracies = [], []
 
@@ -94,7 +94,7 @@ for epoch in range(NUM_EPOCHS):
         train_accuracies.append(train_auc)
         valid_accuracies.append(valid_auc)
 
-        is_best = valid_auc > best_val_auc # let's keep the model that has the best accuracy, but you can also use another metric.
+        is_best = valid_auc > best_val_auc
         if is_best:
             best_val_acc = valid_auc
             torch.save(model, os.path.join(PATH_OUTPUT, SAVE_FILE))
@@ -105,7 +105,7 @@ plot_learning_curves(train_losses, valid_losses, train_accuracies, valid_accurac
 best_model = torch.load(os.path.join(PATH_OUTPUT, SAVE_FILE))
 test_loss, test_accuracy, test_results = evaluate(best_model, device, test_loader, criterion,NUM_CLASSES,COMPETITION)
 roc_score = calculate_auc(test_results[:, 0, :], test_results[:, 1, :], NUM_CLASSES)
-plot_auc(test_results[:, 0, :], test_results[:, 1, :],NUM_CLASSES,CLASS_NAMES)
+plot_auc(test_results[:, 0, :], test_results[:, 1, :],NUM_CLASSES,CLASS_NAMES,args.U)
 
 
 

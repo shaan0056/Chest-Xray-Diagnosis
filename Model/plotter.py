@@ -94,7 +94,7 @@ def plot_confusion_matrixx(y_true, y_pred, classes,
     return ax
 
 
-def plot_auc(ground_truth,prediction,num_classes,class_names):
+def plot_auc(ground_truth,prediction,num_classes,class_names,Uncertainity):
 
     for i in range(num_classes):
 
@@ -102,7 +102,7 @@ def plot_auc(ground_truth,prediction,num_classes,class_names):
         roc_auc = metrics.auc(fpr, tpr)
 
         plt.title('ROC for: ' + class_names[i])
-        plt.plot(fpr, tpr, label='U-ones: AUC = %0.2f' % roc_auc)
+        plt.plot(fpr, tpr, label='U-{}: AUC = %0.2f'.format("ones" if Uncertainity == "ones" else "zeros") % roc_auc)
 
         plt.legend(loc='lower right')
         plt.plot([0, 1], [0, 1], 'r--')
@@ -112,11 +112,3 @@ def plot_auc(ground_truth,prediction,num_classes,class_names):
         plt.xlabel('False Positive Rate')
         plt.savefig("ROC_{}.png".format(class_names[i]), dpi=1000)
         plt.clf()
-
-    # fig_size = plt.rcParams["figure.figsize"]
-    # fig_size[0] = 30
-    # fig_size[1] = 10
-    # plt.rcParams["figure.figsize"] = fig_size
-    #
-    # plt.savefig("ROC1345.png", dpi=1000)
-    # plt.show()
