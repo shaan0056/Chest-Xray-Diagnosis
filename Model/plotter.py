@@ -110,5 +110,5 @@ def plot_auc(ground_truth,prediction,num_classes,class_names,Uncertainity):
         plt.ylim([0, 1])
         plt.ylabel('True Positive Rate')
         plt.xlabel('False Positive Rate')
-        plt.savefig("ROC_{}.png".format(class_names[i]), dpi=1000)
+        plt.savefig("ROC_{}.png".format(class_names[i].replace(" ","_")), dpi=1000)
         plt.clf()
