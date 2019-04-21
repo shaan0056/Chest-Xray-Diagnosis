@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from ChexPertDataset import ChexPertDataset
 from DenseNet121 import DenseNet121
 import torch.optim as optim
-from helper import train, evaluate, calculate_auc
+from helper import train, evaluate, calculate_auc, predict_pathology
 from plotter import plot_learning_curves, plot_confusion_matrix,plot_auc
 import argparse
 
@@ -20,6 +20,9 @@ parser.add_argument('--U', type=str,
                     help='An optional integer argument')
 parser.add_argument('--competition', action='store_true',
                     help='A boolean switch')
+parser.add_argument('--freeze', action='store_true',
+                    help='A boolean switch')
+
 args = parser.parse_args()
 
 
@@ -70,6 +73,16 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=BATCH_SIZE, s
 #Model
 
 model = DenseNet121(NUM_CLASSES)
+
+if args.freeze:
+    ct = 0
+    for name, child in model.named_children():
+        ct += 1
+        if ct < 7:
+            for name2, params in child.named_parameters():
+
+                params.requires_grad = False
+
 model = torch.nn.DataParallel(model)
 
 optimizer = optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-08, weight_decay=1e-5)
@@ -85,8 +98,8 @@ valid_losses, valid_accuracies = [], []
 
 
 for epoch in range(NUM_EPOCHS):
-        train_loss, train_auc = train(model, device, train_loader, criterion, optimizer, epoch,NUM_CLASSES, COMPETITION,PATH_OUTPUT)
-        valid_loss, valid_auc, valid_results = evaluate(model, device, valid_loader, criterion,NUM_CLASSES, COMPETITION)
+        train_loss, train_auc = train(model, device, train_loader, criterion, optimizer, epoch, NUM_CLASSES, COMPETITION,PATH_OUTPUT)
+        valid_loss, valid_auc, valid_results = evaluate(model, device, valid_loader, criterion, NUM_CLASSES, COMPETITION)
 
         train_losses.append(train_loss)
         valid_losses.append(valid_loss)
@@ -106,6 +119,8 @@ best_model = torch.load(os.path.join(PATH_OUTPUT, SAVE_FILE))
 test_loss, test_accuracy, test_results = evaluate(best_model, device, test_loader, criterion,NUM_CLASSES,COMPETITION)
 roc_score = calculate_auc(test_results[:, 0, :], test_results[:, 1, :], NUM_CLASSES)
 plot_auc(test_results[:, 0, :], test_results[:, 1, :],NUM_CLASSES,CLASS_NAMES,args.U)
+
+#print(predict_pathology(model,device,test_loader))
 
 
 

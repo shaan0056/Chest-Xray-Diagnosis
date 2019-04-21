@@ -143,3 +143,30 @@ def calculate_auc(ground_truth, prediction, num_classes, competition=False):
 
     return np.array(out_auroc,dtype=np.float32).mean()
 
+
+def predict_pathology(model, device, data_loader):
+
+    model.eval()
+    probas = []
+
+    with torch.no_grad():
+
+        for i, (input, target) in enumerate(data_loader):
+
+            if isinstance(input, tuple):
+                input = tuple([e.to(device) if type(e) == torch.Tensor else e for e in input])
+            else:
+                input = input.to(device)
+
+            output = model(input)
+
+            y_pred = output.detach().to('cpu')
+            import torch.nn.functional as F
+
+            y_pred = F.softmax(y_pred)
+            y_pred = y_pred.numpy().tolist()
+            print (y_pred)
+            probas.append(y_pred)
+
+
+    return probas[0]
