@@ -104,23 +104,19 @@ def plot_auc(ground_truth,prediction,num_classes,class_names,Uncertainity):
               'violet','olive','tan']
 
     for i in range(num_classes):
-
         fpr, tpr, threshold = metrics.roc_curve(ground_truth[:, i], prediction[:, i])
         roc_auc = metrics.auc(fpr, tpr)
-
-        plt.title('ROC Curve ')
-        plt.plot(fpr, tpr, label='U-{}: AUC = %0.2f'.format("ones" if Uncertainity == "ones" else "zeros") % roc_auc,color=colors[i])
-
+        plt.title('ROC for: ' + class_names[i])
+        plt.plot(fpr, tpr, label='U-{}: AUC = %0.2f'.format("ones" if Uncertainity == "ones" else "zeros") % roc_auc)
+        plt.legend(loc='lower right')
         plt.plot([0, 1], [0, 1], 'r--')
         plt.xlim([0, 1])
         plt.ylim([0, 1])
         plt.ylabel('True Positive Rate')
         plt.xlabel('False Positive Rate')
+        plt.savefig("ROC_{}.png".format(class_names[i].replace(" ", "_")), dpi=1000)
+        plt.clf()
 
-    lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
-    plt.legend(lines,class_names,loc='lower right')
-    plt.savefig("ROC_Curve.png", dpi=1000)
-    plt.clf()
 
 def plot_images(data_loader):
 
