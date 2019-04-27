@@ -2,6 +2,7 @@
 import os
 import time
 import numpy as np
+import pandas as pd
 import torch
 from sklearn.metrics.ranking import roc_auc_score
 
@@ -170,3 +171,12 @@ def predict_pathology(model, device, data_loader):
 
 
     return probas[0]
+
+def save_training_data(train_losses, valid_losses, train_accuracies, valid_accuracies):
+    plot_dict = {}
+    plot_dict['train_loss'] = train_losses
+    plot_dict['val_loss'] = valid_losses
+    plot_dict['train_roc'] = train_accuracies
+    plot_dict['val_roc'] = valid_accuracies
+
+    pd.DataFrame(plot_dict).to_csv('training_hist.csv')

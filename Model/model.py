@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from ChexPertDataset import ChexPertDataset
 from DenseNet121 import DenseNet121
 import torch.optim as optim
-from helper import train, evaluate, calculate_auc, predict_pathology
+from helper import train, evaluate, calculate_auc, predict_pathology, save_training_data
 from plotter import plot_learning_curves, plot_confusion_matrix,plot_auc
 import argparse
 
@@ -72,16 +72,11 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=BATCH_SIZE, s
 
 #Model
 
-model = DenseNet121(NUM_CLASSES)
-
 if args.freeze:
-    ct = 0
-    for name, child in model.named_children():
-        ct += 1
-        if ct < 7:
-            for name2, params in child.named_parameters():
+    model = DenseNet121(NUM_CLASSES,True)
+else:
+    model = DenseNet121(NUM_CLASSES,False)
 
-                params.requires_grad = False
 
 model = torch.nn.DataParallel(model)
 
@@ -92,7 +87,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 criterion.to(device)
 
-best_val_auc = 0.7
+best_val_auc = 0.6
 train_losses, train_accuracies = [], []
 valid_losses, valid_accuracies = [], []
 
@@ -113,6 +108,8 @@ for epoch in range(NUM_EPOCHS):
             torch.save(model, os.path.join(PATH_OUTPUT, SAVE_FILE))
 
 
+
+save_training_data(train_losses, valid_losses, train_accuracies, valid_accuracies)
 plot_learning_curves(train_losses, valid_losses, train_accuracies, valid_accuracies)
 
 best_model = torch.load(os.path.join(PATH_OUTPUT, SAVE_FILE))
