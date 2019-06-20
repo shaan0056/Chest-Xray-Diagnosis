@@ -10,9 +10,8 @@ Dataset can be downloaded from [here](https://stanfordmlgroup.github.io/competit
 
 ## Approach
 
-The inital approach will use the DenseNet121 pretrained models implemented in Pytorch, perform chest x-ray image classification with the CheXpert training dataset using Tranfer Learning and set the benchmarks to improve upon. Then, GAN techniques for data augmentation
-and simulation will be applied to the trained models using Pytorch-GAN and train the aforementioned ConvNets against the newly generated images.Finally, the final trained models will be evaluated using AUC ROC curve on the validation set and the performances will be
-compared.
+The inital approach used the DenseNet121 pretrained models implemented in Pytorch, performed chest x-ray image classification with the CheXpert training dataset using Tranfer Learning and set the benchmarks to improve upon. Then, GAN techniques for data augmentation
+and simulation was applied to the trained models using Pytorch-GAN and trained the aforementioned ConvNets against the newly generated images.Finally, the final trained models was evaluated using AUC ROC curve on the validation set and the performances was compared.
 
 The project is implemented using Python and Pytorch. More details can be found in the final paper ChestXrayUsingGanPaper.pdf.
 
