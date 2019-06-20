@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This study proposes to simualate and augment CheXpert Chest x-ray imaging dataset using Generative Adversarial Networks techniques
+This study proposes to simulate and augment CheXpert Chest x-ray imaging dataset using Generative Adversarial Networks techniques
 for accurate classification of rare diseases, which otherwise could not be effectively diagnosed in an imbalanced
 dataset and then compare the accuracy of the classifier against the CheXpert baseline model.
 
