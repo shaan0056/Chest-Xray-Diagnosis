@@ -2,7 +2,6 @@
 <figure>
  <div>
    <img src="Images/real_fake_img.png" width="500" hspace="40"></div>
-  <div> Real and Fake Chest Xray Images </div>
   </figure>
   
 
